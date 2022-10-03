@@ -1,9 +1,9 @@
 use crate::input::Input;
 use sdl2::{rect::Rect, pixels::Color, render::Canvas, video::Window};
 use threadpool::ThreadPool;
-use std::{time::Duration, sync::mpsc::channel};
+use std::{time::Duration, sync::mpsc::channel,};
 
-const SPEED: f64 =0.4;
+const SPEED: f64 =0.2;
 const THRESHOLD: u32= 2;
 pub const BASE_DEPTH: u32 = 40;
 
@@ -66,10 +66,15 @@ impl Camera {
     }
     fn convert_screen_coordinate_to_world_coordinate(&self, screen_x: u32, screen_y: u32) -> (f64,f64) {
         let (origin_x, origin_y)=self.screen_origin_in_world_coordinate();
-        (
+        let mut tup=(
             2.0 * (screen_x as f64) / (self.zoom * ((self.screen_width - 1) as f64))+origin_x,
             2.0 * (screen_y as f64) / (self.zoom * ((self.screen_height - 1) as f64))+origin_y,
-        )
+        );
+        if self.screen_width>self.screen_height {
+            let aspect_ratio=self.screen_height as f64/self.screen_width as f64;
+            tup=(tup.0, tup.1*aspect_ratio);
+        }
+        tup
     }
     fn get_color_of_world_coordinate(&self, world_coordinate: (f64, f64))->Color {
         let (x0, y0)=world_coordinate;
@@ -92,10 +97,12 @@ impl Camera {
             Color::BLACK
         }
         else {
+            let abs=x2 + y2;
+            let nsmooth = (iteration + 1) as f64 - abs.ln().ln()/(2.0_f64).ln();
             Color::RGB(
-                    ((3 * iteration * iteration + iteration + 4) % 255).try_into().unwrap(),
-                    ((iteration + 2) % 255).try_into().unwrap(),
-                    ((iteration * iteration + 5 * iteration + 20) % 255).try_into().unwrap(),
+                    ((3.0 * nsmooth + 4.0) as u32 % 255).try_into().unwrap(),
+                    ((nsmooth + 2.0) as u32 % 255).try_into().unwrap(),
+                    ((nsmooth*nsmooth + 5.0 * nsmooth + 20.0) as u32 % 255).try_into().unwrap(),
                 )
         }
     }

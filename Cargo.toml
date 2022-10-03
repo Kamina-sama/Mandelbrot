@@ -9,6 +9,9 @@ edition = "2021"
 version = "0.35.2"
 default-features = true
 features = ["ttf"]
+[dependencies.gl]
+git = "https://github.com/bjz/gl-rs"
 
 [dependencies]
 threadpool = "1.8.1"
+

@@ -6,6 +6,15 @@ use sdl2::{
 };
 use std::time::{Duration, Instant};
 
+fn find_sdl_gl_driver() -> Option<u32> {
+    for (index, item) in sdl2::render::drivers().enumerate() {
+        if item.name == "opengl" {
+            return Some(index as u32);
+        }
+    }
+    None
+}
+
 pub struct Engine {
     current_input: Input,
     canvas: Canvas<Window>,
@@ -20,9 +29,14 @@ impl Engine {
         let window = video
             .window("Mandelbrot", screen_size, screen_size)
             .position_centered()
+            .opengl()
             .build()
             .unwrap();
-        let canvas = window.into_canvas().build().unwrap();
+        let canvas = window
+            .into_canvas()
+            .index(find_sdl_gl_driver().unwrap())
+            .build()
+            .unwrap();
         let event_listener = sdl.event_pump().unwrap();
         Self {
             current_input: Input::new(),
@@ -37,9 +51,14 @@ impl Engine {
         let window = video
             .window("Mandelbrot", screen_width, screen_height)
             .position_centered()
+            .opengl()
             .build()
             .unwrap();
-        let canvas = window.into_canvas().build().unwrap();
+        let canvas = window
+            .into_canvas()
+            .index(find_sdl_gl_driver().unwrap())
+            .build()
+            .unwrap();
         let event_listener = sdl.event_pump().unwrap();
         Self {
             current_input: Input::new(),

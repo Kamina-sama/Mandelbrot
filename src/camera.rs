@@ -1,5 +1,5 @@
 use crate::input::Input;
-use sdl2::{rect::Rect, pixels::Color, render::Canvas, video::Window};
+use sdl2::{rect::Rect, pixels::Color, render::Canvas, video::Window, ttf::{Sdl2TtfContext, self}};
 use threadpool::ThreadPool;
 use std::{time::Duration, sync::mpsc::channel,};
 
@@ -113,6 +113,15 @@ impl Camera {
             canvas.set_draw_color(colored_rect.color);
             canvas.fill_rect(colored_rect.rect).unwrap();
         });
+        
+        let ttf2=ttf::init().unwrap(); 
+        let font=ttf2.load_font("./ComicSansMS3.ttf", 20).unwrap();
+        let x=font.render(format!("ZOOM: {:.2}", self.zoom).as_str()).solid(Color::WHITE).unwrap();
+        let z=canvas.texture_creator();
+        let y=x.as_texture(& z).unwrap();
+
+        let info_box: Rect=Rect::new(0,0,200,80);
+        canvas.copy(&y, None, Some(Rect::new(10,-10,200,80)));
     }
     fn render_mandelbrot_recursive(&self, x: u32, y: u32, w: u32, h: u32) -> Vec<ColoredRect> {
         let origin = self.convert_screen_coordinate_to_world_coordinate(x, y);

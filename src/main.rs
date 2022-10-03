@@ -1,11 +1,10 @@
-mod input;
+mod camera;
 mod engine;
-mod camera; 
+mod input;
 
 use engine::Engine;
 
-
 fn main() {
-    let mut engine=Engine::new_rect_screen(1280, 720);
+    let mut engine = Engine::new_rect_screen(1280, 720);
     engine.engine_loop();
 }

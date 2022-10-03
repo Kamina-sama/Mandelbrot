@@ -1,9 +1,8 @@
 use crate::camera;
 
-use super::{input::Input, camera::Camera};
+use super::{camera::Camera, input::Input};
 use sdl2::{
-    self, event::Event, keyboard::Keycode, pixels::Color, render::Canvas,
-    video::Window, EventPump,
+    self, event::Event, keyboard::Keycode, pixels::Color, render::Canvas, video::Window, EventPump,
 };
 use std::time::{Duration, Instant};
 
@@ -53,12 +52,13 @@ impl Engine {
         let mut time_elapsed: Duration = Duration::ZERO;
         let mut now: Instant;
         while !self.current_input.exit {
-            now=Instant::now();
+            now = Instant::now();
             self.process_input();
-            self.camera.update_with_delta_time(&self.current_input, time_elapsed);
+            self.camera
+                .update_with_delta_time(&self.current_input, time_elapsed);
             self.render();
-            time_elapsed=Instant::now()-now;
-            let remaining= ((1_000_000_u32 / 60) as i64)-time_elapsed.as_millis() as i64;
+            time_elapsed = Instant::now() - now;
+            let remaining = ((1_000_000_u32 / 60) as i64) - time_elapsed.as_millis() as i64;
             if remaining > 0 {
                 std::thread::sleep(Duration::from_nanos(remaining as u64));
             }
